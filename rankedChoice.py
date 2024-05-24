@@ -97,9 +97,11 @@ if __name__ == "__main__":
     election = Election(candidate_names)
     election.add_ballot(["Charlie", "Alice", "Bob"])
     election.add_ballot(["Bob", "Alice", "Charlie"])
+    """
     election.add_ballot(["Alice", "Bob", "Charlie"])
     election.add_ballot(["Alice", "Bob", "Charlie"])
     election.add_ballot(["Charlie", "Bob", "Alice"])
+    """
 
     winner = election.run_election()
     print(f"The winner is: {winner}")
