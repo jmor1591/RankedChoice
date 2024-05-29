@@ -87,30 +87,58 @@ class Election:
                 self.eliminated.add(candidate_name)
                 eliminated_candidates.append(candidate_name)
         return eliminated_candidates
-
+    
+    """
     def run_election(self) -> str:
         total_votes = len(self.ballots)
+        if not self.ballots:
+            return "No winner"
         for _ in range(len(self.candidates)):
             self.count_votes()
             winner = self.find_winner(total_votes)
             if winner:
                 return winner
             eliminated_candidates = self.eliminate_candidate()
+            remaining_candidates = set(self.candidates.keys())
+            #print("Eliminated candidates:", eliminated_candidates) #debugging
+            #print("Remaining candidates:", remaining_candidates) #debugging
             if not eliminated_candidates:
                 break  # No candidates left to eliminate
+            if not remaining_candidates:  # Check if there are no remaining candidates
+                return ", ".join(eliminated_candidates)  # Return tied candidates as winners
         return "No winner"
-
-"""
+    """
+    def run_election(self) -> str:
+        total_votes = len(self.ballots)
+        if not self.ballots:  # Check if there are any ballots
+            return "No winner"
+        for _ in range(len(self.candidates)):
+            self.count_votes()
+            winner = self.find_winner(total_votes)
+            if winner:
+                return winner
+            eliminated_candidates = self.eliminate_candidate()
+            remaining_candidates = set(self.candidates.keys())
+            print("Eliminated candidates:", eliminated_candidates)  # Debugging print statement
+            print("Remaining candidates:", remaining_candidates)  # Debugging print statement
+            if not eliminated_candidates:
+                break  # No candidates left to eliminate
+            if not remaining_candidates:  # Check if there are no remaining candidates
+                if eliminated_candidates:
+                    print("No remaining candidates. Returning tied candidates as winners.")  # Debugging print statement
+                    return ", ".join(eliminated_candidates)  # Return tied candidates as winners
+        return "No winner"
+  
+"""  
 # Example usage
 if __name__ == "__main__":
     candidate_names = ["Alice", "Bob", "Charlie"]
     election = Election(candidate_names)
-    election.add_ballot(["Charlie", "Alice", "Bob"])
-    election.add_ballot(["Charlie", "Bob", "Alice"])
-    election.add_ballot(["Alice", "Charlie", "Bob"])
-    election.add_ballot(["Bob", "Alice", "Charlie"])
-    election.add_ballot(["Bob", "Charlie", "Alice"])
+    election.add_ballot([])
+    election.add_ballot([])
+    election.add_ballot(["Charlie, Alice"])
 
     winner = election.run_election()
     print(f"The winner is: {winner}")
+
 """

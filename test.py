@@ -10,16 +10,16 @@ class TestRankedChoiceVoting(unittest.TestCase):
 
     def test_single_winner(self):
         # Test a simple case with a clear winner
+        self.election.add_ballot(["Bob", "Alice", "Charlie"])
+        self.election.add_ballot(["Bob", "Charlie", "Alice"])
         self.election.add_ballot(["Alice", "Bob", "Charlie"])
-        self.election.add_ballot(["Alice", "Charlie", "Bob"])
-        self.election.add_ballot(["Charlie", "Bob", "Alice"])
         self.election.add_ballot(["Bob", "Charlie", "Alice"])
         self.election.add_ballot(["Alice", "Charlie", "Bob"])
 
         winner = self.election.run_election()
-        self.assertEqual(winner, "Alice")
+        self.assertEqual(winner, "Bob")
 
-    def test_tie_case(self):
+    def test_three_case(self):
         # Test case where there's a tie
         # The next preference of each ballot will be chosen to go through the cycle again,
         # If there are no remaining preferences, then and only then will
@@ -30,6 +30,17 @@ class TestRankedChoiceVoting(unittest.TestCase):
 
         winner = self.election.run_election()
         self.assertEqual(winner, "Alice, Bob, Charlie")
+        
+    def test_two_tie_case(self):
+        # Test case where there's a tie
+        # The next preference of each ballot will be chosen to go through the cycle again,
+        # If there are no remaining preferences, then and only then will
+        # multiple winners be returned.
+        self.election.add_ballot(["Alice", "Bob", "Charlie"])
+        self.election.add_ballot(["Bob", "Charlie", "Alice"])
+
+        winner = self.election.run_election()
+        self.assertEqual(winner, "Alice, Bob")
 
     def test_elimination(self):
         # Test the elimination process
@@ -48,8 +59,25 @@ class TestRankedChoiceVoting(unittest.TestCase):
         # Test case with empty ballots
         self.election.add_ballot([])
         self.election.add_ballot([])
+        self.election.add_ballot([])
         winner = self.election.run_election()
-        self.assertEqual(winner, "No winner")
+        self.assertEqual(winner, "Alice, Bob, Charlie")
+    
+    def test_second_edge_case_empty_ballots(self):
+        # Test case with empty ballots
+        self.election.add_ballot([])
+        self.election.add_ballot([])
+        self.election.add_ballot(["Charlie"])
+        winner = self.election.run_election()
+        self.assertEqual(winner, "Charlie")
+        
+    def test_third_edge_case_empty_ballots(self):
+        # Test case with empty ballots
+        self.election.add_ballot([])
+        self.election.add_ballot([])
+        self.election.add_ballot(["Charlie, Alice"])
+        winner = self.election.run_election()
+        self.assertEqual(winner, "Charlie")
 
     def test_edge_case_all_candidates_eliminated(self):
         # Test case where all candidates are eliminated, in the event that there is a tie between ALL remaining candidates
@@ -59,7 +87,7 @@ class TestRankedChoiceVoting(unittest.TestCase):
         self.election.add_ballot(["Charlie"])
 
         winner = self.election.run_election()
-        self.assertEqual(winner, "No winner")
+        self.assertEqual(winner, "Alice, Bob, Charlie")
 
     def test_eliminate_least_voted_candidate(self):
         # Test elimination of the least voted candidate. Charlie will be returned
