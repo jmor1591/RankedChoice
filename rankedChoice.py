@@ -20,12 +20,35 @@ class Ballot:
     def __init__(self, preferences: List[str]):
         self.preferences: List[str] = preferences
         self.current_index: int = 0
+        self.topp_choice: str = preferences[0] if preferences else None
 
     def top_choice(self, eliminated: set) -> Optional[str]:
-        while self.current_index < len(self.preferences) and self.preferences[self.current_index] in eliminated:
-            self.current_index += 1
-        return self.preferences[self.current_index] if self.current_index < len(self.preferences) else None
-
+        # Loop through the preferences and remove any eliminated candidates
+        while self.current_index < len(self.preferences):
+            if self.preferences[self.current_index] in eliminated:
+                # Remove the eliminated candidate from the preferences list
+                self.preferences.pop(self.current_index)
+            else:
+                # Return the first non-eliminated candidate
+                return self.preferences[self.current_index]
+        # Return None if all candidates are eliminated
+        return None
+    
+    def top_choice(self, eliminated: set, k: int = 0) -> Optional[str]:
+        count = 0
+        index = 0
+        while index < len(self.preferences):
+            if self.preferences[index] in eliminated:
+                # Remove the eliminated candidate from the preferences list
+                self.preferences.pop(index)
+                # Do not increment index, as we need to check the new candidate at this index
+            elif count == k:
+                return self.preferences[index]
+            else:
+                count += 1
+                index += 1
+        return None
+        
 class Election:
     def __init__(self, candidate_names: List[str]):
         self.candidates: Dict[str, Candidate] = {name: Candidate(name) for name in candidate_names}
@@ -39,11 +62,12 @@ class Election:
         if top_choice in self.candidates:
             self.candidates[top_choice].increment_vote()
 
-    def count_votes(self) -> None:
+    def count_votes(self, k: int = 0) -> None:
         for ballot in self.ballots:
-            top_choice = ballot.top_choice(self.eliminated)
-            if top_choice in self.candidates:
-                self.candidates[top_choice].increment_vote()
+            old_top = ballot.topp_choice
+            new_choice = ballot.top_choice(self.eliminated,k)
+            if old_top != new_choice and new_choice in self.candidates:
+                self.candidates[new_choice].increment_vote()
 
     def find_winner(self, total_votes: int) -> Optional[str]:
         for candidate in self.candidates.values():
@@ -76,15 +100,17 @@ class Election:
                 break  # No candidates left to eliminate
         return "No winner"
 
+"""
 # Example usage
 if __name__ == "__main__":
     candidate_names = ["Alice", "Bob", "Charlie"]
     election = Election(candidate_names)
     election.add_ballot(["Charlie", "Alice", "Bob"])
-    election.add_ballot(["Bob", "Alice", "Charlie"])
-    election.add_ballot(["Alice", "Bob", "Charlie"])
-    election.add_ballot(["Alice", "Bob", "Charlie"])
     election.add_ballot(["Charlie", "Bob", "Alice"])
+    election.add_ballot(["Alice", "Charlie", "Bob"])
+    election.add_ballot(["Bob", "Alice", "Charlie"])
+    election.add_ballot(["Bob", "Charlie", "Alice"])
 
     winner = election.run_election()
     print(f"The winner is: {winner}")
+"""
