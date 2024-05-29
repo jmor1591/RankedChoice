@@ -1,4 +1,5 @@
 from typing import List, Dict, Optional
+import heapq
 
 class Candidate:
     def __init__(self, name: str):
@@ -14,47 +15,31 @@ class Candidate:
 class Ballot:
     def __init__(self, preferences: List[str]):
         self.preferences: List[str] = preferences
-        self.current_top_choice: Optional[str] = preferences[0] if preferences else None
+        self.current_index: int = 0
 
-    def remove_candidate(self, candidate_name: str) -> None:
-        if candidate_name in self.preferences:
-            self.preferences.remove(candidate_name)
-
-    def top_choice(self, eliminated: List[str]) -> Optional[str]:
-        i = 0
-        while i < len(self.preferences):
-            if self.preferences[i] not in eliminated:
-                self.current_top_choice = self.preferences[i]
-                return self.preferences[i]
-            else:
-                self.remove_candidate(self.preferences[i])  # Remove the eliminated preference
-                i -= 1  # Decrement the index to recheck the current position after removing an element
-            i += 1  # Move to the next preference
-        return None
+    def top_choice(self, eliminated: set) -> Optional[str]:
+        while self.current_index < len(self.preferences) and self.preferences[self.current_index] in eliminated:
+            self.current_index += 1
+        return self.preferences[self.current_index] if self.current_index < len(self.preferences) else None
 
 class Election:
     def __init__(self, candidate_names: List[str]):
         self.candidates: Dict[str, Candidate] = {name: Candidate(name) for name in candidate_names}
         self.ballots: List[Ballot] = []
-        self.lost: List[str] = []
+        self.eliminated: set = set()
 
     def add_ballot(self, preferences: List[str]) -> None:
         ballot = Ballot(preferences)
         self.ballots.append(ballot)
-        # Increment vote count for the initial top choice
-        if ballot.current_top_choice in self.candidates:
-            self.candidates[ballot.current_top_choice].increment_vote()
+        top_choice = ballot.top_choice(self.eliminated)
+        if top_choice in self.candidates:
+            self.candidates[top_choice].increment_vote()
 
-    #optimized so that iterates minimally
     def count_votes(self) -> None:
-        # Only update votes for ballots whose top choice was eliminated
         for ballot in self.ballots:
-            current_top_choice = ballot.current_top_choice
-            new_top_choice = ballot.top_choice(self.lost)
-            if current_top_choice != new_top_choice:
-                if new_top_choice in self.candidates:
-                    self.candidates[new_top_choice].increment_vote()
-                ##ballot.current_top_choice = new_top_choice #redundant
+            top_choice = ballot.top_choice(self.eliminated)
+            if top_choice in self.candidates:
+                self.candidates[top_choice].increment_vote()
 
     def find_winner(self, total_votes: int) -> Optional[str]:
         for candidate in self.candidates.values():
@@ -71,23 +56,20 @@ class Election:
         for candidate_name, candidate in list(self.candidates.items()):
             if candidate.vote_count == min_votes:
                 del self.candidates[candidate_name]
+                self.eliminated.add(candidate_name)
                 eliminated_candidates.append(candidate_name)
-        self.lost.extend(eliminated_candidates)
         return eliminated_candidates
 
     def run_election(self) -> str:
         total_votes = len(self.ballots)
-        i = 0
-        while i < 100:
+        for _ in range(len(self.candidates)):
             self.count_votes()
             winner = self.find_winner(total_votes)
             if winner:
                 return winner
-
             eliminated_candidates = self.eliminate_candidate()
             if not eliminated_candidates:
                 break  # No candidates left to eliminate
-            i += 1
 
         return "No winner"
 
@@ -97,11 +79,9 @@ if __name__ == "__main__":
     election = Election(candidate_names)
     election.add_ballot(["Charlie", "Alice", "Bob"])
     election.add_ballot(["Bob", "Alice", "Charlie"])
-    """
     election.add_ballot(["Alice", "Bob", "Charlie"])
     election.add_ballot(["Alice", "Bob", "Charlie"])
     election.add_ballot(["Charlie", "Bob", "Alice"])
-    """
 
     winner = election.run_election()
     print(f"The winner is: {winner}")
