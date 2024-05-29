@@ -66,10 +66,10 @@ class Election:
 
     def count_votes(self, k: int = 0) -> None:
         for ballot in self.ballots:
-            old_top = ballot.topp_choice
-            new_choice = ballot.top_choice(self.eliminated,k)
-            if old_top != new_choice and new_choice in self.candidates:
-                self.candidates[new_choice].increment_vote()
+            if ballot.topp_choice in self.eliminated:
+                ballot.topp_choice = ballot.top_choice(self.eliminated, k)
+                if ballot.topp_choice is not None:
+                    self.candidates[ballot.topp_choice].increment_vote()
 
     def find_winner(self, total_votes: int) -> Optional[str]:
         for candidate in self.candidates.values():
