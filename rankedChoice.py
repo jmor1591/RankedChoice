@@ -1,4 +1,5 @@
 from typing import List, Dict, Optional
+import random
 import heapq
 
 ##TODO:
@@ -10,14 +11,14 @@ class Candidate:
         self.name: str = name
         self.vote_count: int = 0
 
-    def increment_vote(self) -> None:
-        self.vote_count += 1
+    def increment_vote(self, n: int = 1) -> None:
+        self.vote_count += n
 
-    def decrement_vote(self) -> None:
-        self.vote_count -= 1
+    def decrement_vote(self, n: int = 1) -> None:
+        self.vote_count -= n
         
     def __repr__(self) -> str:
-        return f"{self.name}: {self.vote_count}"
+        return f"{self.vote_count}"
 
 class Ballot:
     def __init__(self, preferences: List[str]):
@@ -42,16 +43,28 @@ class Ballot:
         def __repr__(self) -> str:
             return f"Ballot({self.preferences})"
         
+        def __eq__(self, other):
+            if isinstance(other, Ballot):
+                return self.preferences == other.preferences
+            return False
+        
+        def __hash__(self):
+            return hash(tuple(self.preferences))
+        
 class Election:
     def __init__(self, candidate_names: List[str]):
         self.candidates: Dict[str, Candidate] = {name: Candidate(name) for name in candidate_names}
-        self.ballots: List[Ballot] = []
+        self.ballots: Dict[Ballot, int] = {}
         self.eliminated: set = set()
 
     def add_ballot(self, preferences: List[str]) -> None:
         if preferences:
             ballot = Ballot(preferences)
-            self.ballots.append(ballot)
+            top_choice = ballot.top_choice(self.eliminated,self.candidates)
+            if ballot in self.ballots:
+                self.ballots[ballot] += 1
+            else:
+                self.ballots[ballot] = 1
             top_choice = ballot.top_choice(self.eliminated,self.candidates)
             #print(top_choice) #debugging
             #initial vote
@@ -63,11 +76,11 @@ class Election:
         Counts the votes by looking at each top choice and adds. Redistributes votes
         if top choice of the ballot is in eliminated/got eliminated.
         """
-        for ballot in self.ballots:
+        for ballot, count in self.ballots.items():
             if ballot.topp_choice in self.eliminated or k > 0:
                 ballot.topp_choice = ballot.top_choice(self.eliminated, self.candidates, k)
                 if ballot.topp_choice is not None:
-                    self.candidates[ballot.topp_choice].increment_vote()
+                    self.candidates[ballot.topp_choice].increment_vote(count)
 
     def find_winner(self, total_votes: int) -> Optional[str]:
         for candidate in self.candidates.values():
@@ -100,9 +113,9 @@ class Election:
         while True:
             max_k = max(max_k, k)
             # Debugging print statements
-            print(f"\nCount Votes with k={k}")
+            #print(f"\nCount Votes with k={k}") #debugging
             self.count_votes(k)
-            print(f"Candidates after counting votes: {self.candidates}")
+            #print(f"Candidates after counting votes: {self.candidates}") #debugging
 
             winner = self.find_winner(total_votes * (2 ** max_k))
             if winner:
@@ -111,8 +124,8 @@ class Election:
             candidates_to_eliminate = self.find_candidates_with_min_votes()
             remaining_candidates = set(self.candidates.keys())
 
-            print(f"Remaining candidates: {remaining_candidates}")
-            print(f"Candidates to eliminate: {candidates_to_eliminate}")
+            #print(f"Remaining candidates: {remaining_candidates}") #debugging
+            #print(f"Candidates to eliminate: {candidates_to_eliminate}") #debugging
 
             if set(candidates_to_eliminate) == remaining_candidates:
                 if k < len(self.candidates) - 1:
@@ -121,7 +134,7 @@ class Election:
                     break
             else:
                 self.eliminate_candidates(candidates_to_eliminate)
-                print(f"End Remaining candidates: {set(self.candidates.keys())}")
+                #print(f"End Remaining candidates: {set(self.candidates.keys())}") #debugging
                 k = 0
 
             if not self.candidates:
@@ -132,17 +145,15 @@ class Election:
             return ", ".join(remaining_candidates)
         return "No winner"
 
-"""  
+"""
 # Example usage
 if __name__ == "__main__":
-    candidate_names = ["Alice", "Bob", "Charlie", "Evan"]
+    candidate_names = ["Candidate" + str(i) for i in range(1, 101)]  # 100 candidates
     election = Election(candidate_names)
-    election.add_ballot(["Alice", "Bob", "Charlie", "Evan"])
-    election.add_ballot(["Bob", "Alice", "Charlie", "Evan"])
-    election.add_ballot(["Charlie", "Bob", "Alice", "Evan"])
-    election.add_ballot(["Evan", "Alice", "Charlie", "Bob"])
-    election.add_ballot(["Bob", "Charlie", "Alice", "Evan"])
-    election.add_ballot(["Alice", "Charlie", "Bob", "Evan"])
+    for _ in range(1000):  # 1000 ballots
+        preferences = random.sample(candidate_names, len(candidate_names))
+        election.add_ballot(preferences)
+    winner = election.run_election()
 
     winner = election.run_election()
     print(f"The winner is: {winner}")
