@@ -22,10 +22,26 @@ class Candidate:
 
 class Ballot:
     def __init__(self, preferences: List[str]):
-        self.preferences: List[str] = preferences if preferences else None
+        seen = set()
+        self.preferences: List[str] = [x for x in preferences if not (x in seen or seen.add(x))]
         self.topp_choice: str = preferences[0] if preferences else None
     
     def top_choice(self, eliminated: set, candidates: set, k: int = 0) -> Optional[str]:
+        """
+        Returns the top valid choice from the ballot's preference list and removes any invalid choices from the list.
+
+        This method iterates through the ballot's preferences, removing any candidates that have been eliminated 
+        or are not in the list of valid candidates. It returns the k-th valid choice (0 for the top choice, 
+        1 for the second choice, etc.) from the updated preferences list.
+
+        Args:
+            eliminated (set): A set of eliminated candidate names.
+            candidates (set): A set of valid candidate names.
+            k (int, optional): The index of the valid choice to return (0 for top choice, 1 for second choice, etc.). Defaults to 0.
+
+        Returns:
+            Optional[str]: The k-th valid candidate name from the updated preferences list, or None if no valid choice is found.
+        """
         count = 0
         index = 0
         while index < len(self.preferences):
@@ -33,7 +49,7 @@ class Ballot:
                 # Remove the eliminated candidate from the preferences list
                 self.preferences.pop(index)
                 # Do not increment index, as we need to check the new candidate at this index
-            elif count == k:
+            elif count == k: #if we want the top choice then k=0, if we want the second choice then k=1
                 return self.preferences[index]
             else:
                 count += 1
@@ -58,6 +74,16 @@ class Election:
         self.eliminated: set = set()
 
     def add_ballot(self, preferences: List[str]) -> None:
+        """
+        Adds a ballot with the given preferences to the election.
+
+        This method creates a Ballot object from the provided list of candidate preferences,
+        adds it to the collection of ballots, and increments the vote count for the top-choice
+        candidate if they have not been eliminated.
+
+        Args:
+            preferences (List[str]): A list of candidate names in order of preference.
+        """
         if preferences:
             ballot = Ballot(preferences)
             top_choice = ballot.top_choice(self.eliminated,self.candidates)
@@ -65,7 +91,6 @@ class Election:
                 self.ballots[ballot] += 1
             else:
                 self.ballots[ballot] = 1
-            top_choice = ballot.top_choice(self.eliminated,self.candidates)
             #print(top_choice) #debugging
             #initial vote
             if top_choice in self.candidates:
@@ -73,8 +98,16 @@ class Election:
 
     def count_votes(self, k: int = 0) -> None:
         """
-        Counts the votes by looking at each top choice and adds. Redistributes votes
-        if top choice of the ballot is in eliminated/got eliminated.
+        Counts the votes for the current round of the election, redistributing votes if necessary.
+
+        This method iterates through all ballots and counts the votes for the candidates based on the top valid 
+        choice from each ballot. If the top choice of a ballot is eliminated or if k > 0 (indicating a re-evaluation 
+        of choices), it finds the next valid choice and counts the vote for that candidate. Votes are incremented 
+        by the count of identical ballots.
+
+        Args:
+            k (int, optional): The index of the valid choice to consider if the top choice is eliminated or 
+                            if a re-evaluation is needed (0 for top choice, 1 for second choice, etc.). Defaults to 0.
         """
         for ballot, count in self.ballots.items():
             if ballot.topp_choice in self.eliminated or k > 0:
@@ -83,6 +116,19 @@ class Election:
                     self.candidates[ballot.topp_choice].increment_vote(count)
 
     def find_winner(self, total_votes: int) -> Optional[str]:
+        """
+        Determines if there is a candidate who has received more than half of the total votes.
+
+        This method iterates through all candidates and checks if any candidate has a vote count
+        greater than half of the total votes cast. If such a candidate is found, their name is
+        returned as the winner.
+
+        Args:
+            total_votes (int): The total number of votes cast in the election.
+
+        Returns:
+            Optional[str]: The name of the winning candidate if one is found, otherwise None.
+        """
         for candidate in self.candidates.values():
             #print(candidate.vote_count) #debugging
             if candidate.vote_count > total_votes / 2:
@@ -145,16 +191,23 @@ class Election:
             return ", ".join(remaining_candidates)
         return "No winner"
 
-"""
+
 # Example usage
 if __name__ == "__main__":
+    election = Election(["Bob", "Alice", "Charlie"])
+    election.add_ballot(["Alice", "Alice", "Charlie", "Bob", "Bob"]) #Alice Charlie, Bob
+    election.add_ballot(["Charlie", "Bob", "Bob", "Alice"])          #Charlie Bob, Alice
+    election.add_ballot(["Bob", "Bob", "Bob", "Charlie", "Alice"])
+
+    winner = election.run_election()
+    print(f"The winner is: {winner}")
+    """
     candidate_names = ["Candidate" + str(i) for i in range(1, 101)]  # 100 candidates
     election = Election(candidate_names)
     for _ in range(1000):  # 1000 ballots
         preferences = random.sample(candidate_names, len(candidate_names))
         election.add_ballot(preferences)
-    winner = election.run_election()
 
     winner = election.run_election()
     print(f"The winner is: {winner}")
-"""
+    """

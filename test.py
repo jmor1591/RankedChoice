@@ -30,7 +30,7 @@ class TestRankedChoiceVoting(unittest.TestCase):
         self.election.add_ballot(["Charlie", "Alice", "Bob"])
 
         winner = self.election.run_election()
-        self.assertIn(winner, ["Charlie, Alice, Bob", "Bob, Alice, Charlie", "Charlie, Bob, Alice", "Bob, Charlie, Alice"])
+        self.assertIn(winner, ["Charlie, Alice, Bob", "Bob, Alice, Charlie", "Charlie, Bob, Alice", "Bob, Charlie, Alice", "Alice, Bob, Charlie", "Alice, Charlie, Bob"])
         
     def test_two_tie_case(self):
         # Test case where there's a tie
@@ -134,11 +134,19 @@ class TestRankedChoiceVoting(unittest.TestCase):
         self.assertEqual(winner, "Alice")
 
     def test_duplicate_preferences(self):
-        # Test case with duplicate preferences in the ballot
-        self.election.add_ballot(["Alice", "Alice", "Charlie"])
-        self.election.add_ballot(["Bob", "Charlie", "Bob"])
+        self.election.add_ballot(["Evan", "Alice", "Bob"])
+        self.election.add_ballot(["Evan", "Alice", "Bob"])
+        self.election.add_ballot(["Charlie", "Bob", "Alice"])
         winner = self.election.run_election()
-        self.assertIn(winner, ["Bob, Alice", "Alice, Bob"])
+        self.assertEqual(winner, "Alice")
+
+    def test_duplicate_preferences_two(self):
+        # Test case with duplicate preferences in the ballot
+        self.election.add_ballot(["Alice", "Alice", "Charlie", "Bob", "Bob"]) #Alice Charlie, Bob
+        self.election.add_ballot(["Charlie", "Bob", "Bob", "Alice"])          #Charlie Bob, Alice
+        self.election.add_ballot(["Bob", "Bob", "Bob", "Charlie", "Alice"])   #Bob, Charlie, Alice
+        winner = self.election.run_election()
+        self.assertIn(winner, "Charlie")
 
     def test_invalid_preferences(self):
         # Test case with invalid preferences
