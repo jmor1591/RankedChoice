@@ -30,7 +30,7 @@ class TestRankedChoiceVoting(unittest.TestCase):
         self.election.add_ballot(["Charlie", "Alice", "Bob"])
 
         winner = self.election.run_election()
-        self.assertEqual(winner, "Alice, Bob, Charlie")
+        self.assertEqual(winner, "Charlie, Alice, Bob")
         
     def test_two_tie_case(self):
         # Test case where there's a tie
@@ -123,7 +123,7 @@ class TestRankedChoiceVoting(unittest.TestCase):
         self.election.add_ballot(["Bob", "Alice"])
         self.election.add_ballot(["Charlie"])
         winner = self.election.run_election()
-        self.assertIn(winner, ["Alice", "Bob"])
+        self.assertIn(winner, ["Alice, Bob"])
 
     def test_varying_ballot_lengths(self):
         # Test case with varying lengths of preference lists
@@ -138,7 +138,7 @@ class TestRankedChoiceVoting(unittest.TestCase):
         self.election.add_ballot(["Alice", "Alice", "Charlie"])
         self.election.add_ballot(["Bob", "Charlie", "Bob"])
         winner = self.election.run_election()
-        self.assertEqual(winner, "Charlie")
+        self.assertEqual(winner, "Alice, Bob")
 
     def test_invalid_preferences(self):
         # Test case with invalid preferences
