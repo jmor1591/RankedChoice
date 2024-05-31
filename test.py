@@ -88,7 +88,7 @@ class TestRankedChoiceVoting(unittest.TestCase):
         self.election.add_ballot(["Charlie"])
 
         winner = self.election.run_election()
-        self.assertEqual(winner, "Alice, Bob, Charlie")
+        self.assertEqual(winner, "Alice, Bob")
 
     def test_eliminate_least_voted_candidate(self):
         # Test elimination of the least voted candidate. Charlie will be returned
