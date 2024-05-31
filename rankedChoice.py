@@ -61,10 +61,15 @@ class Election:
             self.ballots.append(ballot)
             top_choice = ballot.top_choice(self.eliminated)
             #print(top_choice) #debugging
+            #initial vote
             if top_choice in self.candidates:
                 self.candidates[top_choice].increment_vote()
 
     def count_votes(self, k: int = 0) -> None:
+        """
+        Counts the votes by looking at each top choice and adds. Redistributes votes
+        if top choice of the ballot is in eliminated/got eliminated.
+        """
         for ballot in self.ballots:
             if ballot.topp_choice in self.eliminated:
                 ballot.topp_choice = ballot.top_choice(self.eliminated, k)
