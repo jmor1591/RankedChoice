@@ -22,8 +22,8 @@ class Candidate:
 
 class Ballot:
     def __init__(self, preferences: List[str]):
-        seen = set()
-        self.preferences: List[str] = [x for x in preferences if not (x in seen or seen.add(x))]
+        seen = set() #creates set so that duplicates can be identified in O(1) time
+        self.preferences: List[str] = [x for x in preferences if not (x in seen or seen.add(x))] #preferences in order with no duplicates
         self.topp_choice: str = preferences[0] if preferences else None
     
     def top_choice(self, eliminated: set, candidates: set, k: int = 0) -> Optional[str]:
@@ -136,6 +136,16 @@ class Election:
         return None
 
     def find_candidates_with_min_votes(self) -> List[str]:
+        """
+        Finds the candidates with the minimum number of votes.
+
+        This method determines the minimum number of votes among all candidates 
+        and returns a list of candidate names who received that minimum number 
+        of votes. If there are no candidates, an empty list is returned.
+
+        Returns:
+            List[str]: A list of candidate names with the minimum number of votes.
+        """
         if not self.candidates:
             return []
 
@@ -144,12 +154,37 @@ class Election:
         return candidates_with_min_votes
 
     def eliminate_candidates(self, candidates_to_eliminate: List[str]) -> None:
+        """
+        Eliminates the specified candidates from the election.
+
+        This method removes the specified candidates from the list of candidates 
+        and adds their names to the set of eliminated candidates. If a candidate 
+        to eliminate is not present in the list of candidates, it is ignored.
+
+        Args:
+            candidates_to_eliminate (List[str]): A list of candidate names to eliminate.
+        """
         for candidate_name in candidates_to_eliminate:
             if candidate_name in self.candidates:
                 del self.candidates[candidate_name]
                 self.eliminated.add(candidate_name)
     
     def run_election(self) -> str:
+        """
+        Executes the election process and determines the winner.
+
+        This method runs the election process until a winner is determined or 
+        no winner can be found. It iterates through each round of the election, 
+        counting votes, eliminating candidates with the minimum votes, and 
+        adjusting the parameters for the next round if necessary. If a winner 
+        is found, their name is returned as the winner. If there are remaining 
+        candidates with votes, their names are joined and returned. If there 
+        are no candidates or ballots, it returns "No winner".
+
+        Returns:
+            str: The name(s) of the winner(s) if found, or "No winner" if no winner 
+                can be determined.
+        """
         total_votes = len(self.ballots)
         if not self.ballots:
             return "No winner"
@@ -194,15 +229,7 @@ class Election:
 
 # Example usage
 if __name__ == "__main__":
-    election = Election(["Bob", "Alice", "Charlie"])
-    election.add_ballot(["Alice", "Alice", "Charlie", "Bob", "Bob"]) #Alice Charlie, Bob
-    election.add_ballot(["Charlie", "Bob", "Bob", "Alice"])          #Charlie Bob, Alice
-    election.add_ballot(["Bob", "Bob", "Bob", "Charlie", "Alice"])
-
-    winner = election.run_election()
-    print(f"The winner is: {winner}")
-    """
-    candidate_names = ["Candidate" + str(i) for i in range(1, 101)]  # 100 candidates
+    candidate_names = ["Candidate" + str(i) for i in range(1, 6)]  # 100 candidates
     election = Election(candidate_names)
     for _ in range(1000):  # 1000 ballots
         preferences = random.sample(candidate_names, len(candidate_names))
@@ -210,4 +237,3 @@ if __name__ == "__main__":
 
     winner = election.run_election()
     print(f"The winner is: {winner}")
-    """
