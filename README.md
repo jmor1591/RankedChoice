@@ -31,13 +31,23 @@ for ballot in ballots:
 
 # Run the election
 winner = election.run_election()
+
 print(f"The winner is: {winner}")
-Benefits
+
+# Benefits
+
 Improved Efficiency: The program's efficient vote counting system allows for fast and accurate results.
+
 Increased Flexibility: The program's flexible election creation system allows for a wide range of scenarios to be tested.
+
 Enhanced Accuracy: The program's unit testing system ensures correct functionality and catches any bugs.
-Future Development
+
+# Future Development
+
 Improved Algorithm: The program's ranked choice voting algorithm could be improved to handle more complex scenarios.
+
 Additional Features: The program could be expanded to include additional features, such as support for multiple voting systems or advanced analytics.
-Conclusion
+
+# Conclusion
+
 This program demonstrates a simple ranked choice voting system, allowing users to create an election with multiple candidates and ballots. The program's efficient vote counting system and flexible election creation system make it a useful tool for testing and analyzing ranked choice voting scenarios.
