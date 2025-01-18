@@ -1,15 +1,23 @@
 # Ranked Choice Voting Program
 # Overview
+
 This program simulates a ranked choice voting system, allowing users to create an election with multiple candidates and ballots. The program then determines the winner(s) of the election based on the ranked choice voting algorithm.
 
-Key Features
+# Key Features
+
 Ranked Choice Voting Algorithm: The program implements a simple ranked choice voting algorithm, where the candidate with the fewest votes is eliminated in each round.
+
 Flexible Election Creation: Users can create an election with multiple candidates and ballots, allowing for a wide range of scenarios to be tested.
-Efficient Vote Counting: The program uses a efficient vote counting system, allowing for fast and accurate results.
+
+Efficient Vote Counting: The program uses a efficient vote counting system that aims for an optimal Time Complexity, allowing for fast and accurate results.
+
 Unit Testing: The program includes a suite of unit tests to ensure correct functionality and catch any bugs.
 Technical Details
+
 Programming Language: Python 3.8 or later
+
 Libraries: random and heapq libraries (included with Python)
+
 Data Structures: The program uses dictionaries and lists to store candidate and ballot data.
 
 # Create a list of candidate names
