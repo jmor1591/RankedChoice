@@ -1,67 +1,47 @@
-Project Title:
+Ranked Choice Voting Program
+Overview
+This program simulates a ranked choice voting system, allowing users to create an election with multiple candidates and ballots. The program then determines the winner(s) of the election based on the ranked choice voting algorithm.
 
-Ranked Choice Voting System
-
-Description:
-
-The Election Voting System is a Python implementation of a voting system to conduct elections using preferential voting. It allows users to cast their votes by ranking candidates according to their preferences. The system then processes the votes to determine the winner based on the ranked preferences of the voters.
-
-Table of Contents:
-
-Installation
-Usage
-Configuration
-Contributing
-License
-Credits
-Contact
-1. Installation:
-
-To use the Election Voting System, follow these steps:
-
-Clone the repository from GitHub:
-
-bash
-Copy code
-git clone https://github.com/username/repository.git
-Install the required dependencies:
-
-Copy code
-pip install -r requirements.txt
-2. Usage:
-
-To conduct an election using the system:
-
-Import the Election class into your Python script.
-Create an instance of the Election class, providing a list of candidate names.
-Add ballots to the election using the add_ballot method, specifying the preferences of each voter.
-Run the election using the run_election method to determine the winner.
-Example:
-
+Key Features
+Ranked Choice Voting Algorithm: The program implements a simple ranked choice voting algorithm, where the candidate with the fewest votes is eliminated in each round.
+Flexible Election Creation: Users can create an election with multiple candidates and ballots, allowing for a wide range of scenarios to be tested.
+Efficient Vote Counting: The program uses a efficient vote counting system, allowing for fast and accurate results.
+Unit Testing: The program includes a suite of unit tests to ensure correct functionality and catch any bugs.
+Technical Details
+Programming Language: Python 3.8 or later
+Libraries: random and heapq libraries (included with Python)
+Data Structures: The program uses dictionaries and lists to store candidate and ballot data.
+Example Usage
 python
+Insert Code
+Run
 Copy code
-from election import Election
-
+# Create a list of candidate names
 candidate_names = ["Candidate1", "Candidate2", "Candidate3"]
+
+# Create a list of ballots
+ballots = [
+    ["Candidate1", "Candidate2", "Candidate3"],
+    ["Candidate2", "Candidate3", "Candidate1"],
+    ["Candidate3", "Candidate1", "Candidate2"]
+]
+
+# Create an instance of the Election class
 election = Election(candidate_names)
 
-# Add ballots
-election.add_ballot(["Candidate1", "Candidate2", "Candidate3"])
-election.add_ballot(["Candidate2", "Candidate1", "Candidate3"])
-# Add more ballots...
+# Add ballots to the election
+for ballot in ballots:
+    election.add_ballot(ballot)
 
 # Run the election
 winner = election.run_election()
 print(f"The winner is: {winner}")
-3. Configuration:
-
-The Election Voting System does not require any additional configuration.
-
-5. License:
-
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-6. Credits:
-
-The Ranked Choice Voting System was created by Jordan Morris.
-
+Benefits
+Improved Efficiency: The program's efficient vote counting system allows for fast and accurate results.
+Increased Flexibility: The program's flexible election creation system allows for a wide range of scenarios to be tested.
+Enhanced Accuracy: The program's unit testing system ensures correct functionality and catches any bugs.
+Future Development
+Improved Algorithm: The program's ranked choice voting algorithm could be improved to handle more complex scenarios.
+Additional Features: The program could be expanded to include additional features, such as support for multiple voting systems or advanced analytics.
+Conclusion
+This program demonstrates a simple ranked choice voting system, allowing users to create an election with multiple candidates and ballots. The program's efficient vote counting system and flexible election creation system make it a useful tool for testing and analyzing ranked choice voting scenarios.
