@@ -11,11 +11,7 @@ Technical Details
 Programming Language: Python 3.8 or later
 Libraries: random and heapq libraries (included with Python)
 Data Structures: The program uses dictionaries and lists to store candidate and ballot data.
-Example Usage
-python
-Insert Code
-Run
-Copy code
+
 # Create a list of candidate names
 candidate_names = ["Candidate1", "Candidate2", "Candidate3"]
 
