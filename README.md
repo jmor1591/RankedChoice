@@ -1,5 +1,5 @@
-Ranked Choice Voting Program
-Overview
+# Ranked Choice Voting Program
+# Overview
 This program simulates a ranked choice voting system, allowing users to create an election with multiple candidates and ballots. The program then determines the winner(s) of the election based on the ranked choice voting algorithm.
 
 Key Features
